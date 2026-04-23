@@ -241,6 +241,39 @@ scripts/claude/sync-agent-guidelines.sh -i "/path/to/your/source-root" -o "$PWD"
 .\scripts\claude\sync-agent-guidelines.ps1 -InputPath "C:\path\to\your\source-root" -OutputPath $PWD
 ```
 
+## Running the sync from an AI assistant (`agent-conf-sync` skill)
+
+This repo also ships the [`agent-conf-sync`](skills/agent-conf-sync/SKILL.md)
+skill, so you don’t have to assemble CLI flags by hand. Once the skill is
+installed for your AI coding assistant (Cursor, Claude Code, GitHub Copilot,
+JetBrains Junie, …), describe the sync in plain language and the assistant will:
+
+1. Detect whether to invoke `scripts/sync-all.sh` (macOS/Linux/Git Bash) or `scripts/sync-all.ps1` (Windows PowerShell).
+2. Locate the script root (workspace root, a submodule path, or a search under the workspace).
+3. Infer `-i`/`-o`, `--tools`, `--items`, and `--clean` from your request.
+4. Run the script, capture output, and return a compact report (what was cleaned, what was written, and why).
+
+Install the skill by syncing it into your assistant’s native layout the same way
+you do with any other skill in this repo — e.g. point a run of `sync-all` at a
+source tree that contains `skills/agent-conf-sync/` (this repo itself does), or
+copy the folder into your own source tree’s `skills/`.
+
+Example prompts (user) → what the assistant runs:
+
+- “Sync everything for all tools from `_internal` into the repo root.”
+  → `scripts/sync-all.sh -i <repo>/_internal -o <repo>`
+- “Regenerate only Cursor and Claude for `delegate-to-aside`.”
+  → `scripts/sync-all.sh -i <src> -o <out> --tools cursor,claude --items delegate-to-aside`
+- “Clean sync for Copilot only.”
+  → `scripts/sync-all.sh -i <src> -o <out> --tools copilot --clean` (with the
+  `--clean` warning surfaced before running)
+- “Same thing on Windows.”
+  → `scripts\sync-all.ps1 -InputRoot <src> -OutputRoot <out> -Tools copilot -Clean`
+
+If anything is ambiguous (missing input root, conflicting tool names), the skill
+asks once instead of guessing. See the skill file for the full inference rules
+and the required post-run report format.
+
 ## How each tool consumes the generated files
 
 These scripts generate files in the locations each tool expects. For the full,
