@@ -25,7 +25,7 @@ CLEAN=false
 clean_dir_contents() {
   local d="$1"
   [[ -d "$d" ]] || return 0
-  find "$d" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+  find "$d" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
 }
 
 # Print the caller script's leading "# ..." comment block (help text).
@@ -82,9 +82,15 @@ parse_io_args() {
   CLEAN=false
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -i|--input)  INPUT="${2:-}"; shift 2;;
-      -o|--output) OUTPUT="${2:-}"; shift 2;;
-      --items)     ITEMS="${2:-}"; shift 2;;
+      -i|--input)
+        if [[ $# -lt 2 ]]; then echo "Error: $1 requires a value." >&2; echo >&2; _print_help_from_caller "$caller" >&2; exit 2; fi
+        INPUT="$2"; shift 2;;
+      -o|--output)
+        if [[ $# -lt 2 ]]; then echo "Error: $1 requires a value." >&2; echo >&2; _print_help_from_caller "$caller" >&2; exit 2; fi
+        OUTPUT="$2"; shift 2;;
+      --items)
+        if [[ $# -lt 2 ]]; then echo "Error: $1 requires a value." >&2; echo >&2; _print_help_from_caller "$caller" >&2; exit 2; fi
+        ITEMS="$2"; shift 2;;
       --clean)     CLEAN=true; shift;;
       -h|--help)   _print_help_from_caller "$caller"; exit 0;;
       *)           echo "Unknown arg: $1" >&2; echo >&2; _print_help_from_caller "$caller" >&2; exit 2;;
@@ -219,7 +225,14 @@ sync_items() {
 
   local -a selected=()
   if [[ -n "$ITEMS" ]]; then
-    IFS=',' read -r -a selected <<< "$ITEMS"
+    local -a raw=()
+    IFS=',' read -r -a raw <<< "$ITEMS"
+    local item trimmed
+    for item in "${raw[@]}"; do
+      trimmed="${item#"${item%%[![:space:]]*}"}"
+      trimmed="${trimmed%"${trimmed##*[![:space:]]}"}"
+      [[ -n "$trimmed" ]] && selected+=("$trimmed")
+    done
   else
     selected=("${all[@]+"${all[@]}"}")
   fi

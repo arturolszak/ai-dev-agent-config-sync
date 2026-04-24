@@ -20,7 +20,7 @@ mapped** into each tool’s native file set).
 This repo is based on **vendor-documented behavior** for Cursor, Claude Code, GitHub Copilot, and JetBrains Junie.
 
 - **Doc snapshot date:** **2026-04-23** (when the formats + behaviors in this README were last checked).
-- **If something stops working after an update:** re-check the relevant venśdor docs and adjust the scripts/docs here.
+- **If something stops working after an update:** re-check the relevant vendor docs and adjust the scripts/docs here.
 - **More detail:** pinned versions live in [`tool-versions.md`](tool-versions.md); a per-tool field reference lives in [`tools.md`](tools.md).
 
 ## Repository layout
@@ -362,7 +362,7 @@ git subtree pull --prefix=path/to/ai-dev-agent-config-sync https://github.com/ar
 From your project, with this repo at `path/to/ai-dev-agent-config-sync`:
 
 ```bash
-path/to/ai-dev-agent-config-sync/scripts/sync-all.sh
+path/to/ai-dev-agent-config-sync/scripts/sync-all.sh -i path/to/ai-dev-agent-config-sync/examples -o .
 ```
 
 On Windows, use `path\to\ai-dev-agent-config-sync\scripts\sync-all.ps1`.

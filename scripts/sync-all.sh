@@ -27,10 +27,18 @@ SYNC_ALL_CLEAN=false
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -i|--input)  INPUT_BASE="${2:-}"; shift 2;;
-    -o|--output) OUTPUT_BASE="${2:-}"; shift 2;;
-    --tools)     TOOLS="${2:-}"; shift 2;;
-    --items)     ITEMS="${2:-}"; shift 2;;
+    -i|--input)
+      if [[ $# -lt 2 ]]; then echo "Error: $1 requires a value." >&2; echo >&2; sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; fi
+      INPUT_BASE="$2"; shift 2;;
+    -o|--output)
+      if [[ $# -lt 2 ]]; then echo "Error: $1 requires a value." >&2; echo >&2; sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; fi
+      OUTPUT_BASE="$2"; shift 2;;
+    --tools)
+      if [[ $# -lt 2 ]]; then echo "Error: $1 requires a value." >&2; echo >&2; sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; fi
+      TOOLS="$2"; shift 2;;
+    --items)
+      if [[ $# -lt 2 ]]; then echo "Error: $1 requires a value." >&2; echo >&2; sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//' >&2; exit 2; fi
+      ITEMS="$2"; shift 2;;
     --clean)     SYNC_ALL_CLEAN=true; shift;;
     -h|--help)
       sed -n '2,17p' "$0" | sed 's/^# \{0,1\}//'
