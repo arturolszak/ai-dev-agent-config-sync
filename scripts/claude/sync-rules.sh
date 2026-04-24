@@ -11,7 +11,7 @@
 #
 # Examples:
 #   sync-rules.sh -i "$PWD/examples/rules" -o "$PWD"
-#   sync-rules.sh -i "$PWD/examples/rules" -o "$PWD"
+#   sync-rules.sh -i "$PWD/examples/rules" -o "$PWD" --clean
 
 COMMON="$(cd "$(dirname "${BASH_SOURCE[0]}")/../common" && pwd)/common.sh"
 source "$COMMON"

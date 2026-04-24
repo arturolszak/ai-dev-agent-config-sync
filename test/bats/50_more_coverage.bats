@@ -14,17 +14,12 @@ load test_helper
 }
 
 @test "skill frontmatter translation: cursor strips applies-to; claude renames to paths" {
-  # Add applies-to inside SKILL.md frontmatter
-  python3 - "$TEST_SRC" <<'PY'
-import pathlib, sys
-root = pathlib.Path(sys.argv[1])
-p = root / "skills/alpha/SKILL.md"
-s = p.read_text(encoding="utf-8")
-needle = "description: First test skill.\n"
-if needle in s and "applies-to:" not in s:
-    s = s.replace(needle, needle + 'applies-to: "**/*.java"\n')
-p.write_text(s, encoding="utf-8")
-PY
+  # Add applies-to inside SKILL.md frontmatter using awk (no python3 required)
+  skill_file="$TEST_SRC/skills/alpha/SKILL.md"
+  if grep -q 'description: First test skill.' "$skill_file" && ! grep -q 'applies-to:' "$skill_file"; then
+    awk '/^description: First test skill\.$/ { print; print "applies-to: \"**/*.java\""; next } { print }' \
+      "$skill_file" > "$skill_file.tmp" && mv "$skill_file.tmp" "$skill_file"
+  fi
 
   # Cursor strips
   run bash "${REPO_ROOT}/scripts/cursor/sync-skills.sh" -i "$TEST_SRC/skills" -o "$TEST_OUT" --items alpha

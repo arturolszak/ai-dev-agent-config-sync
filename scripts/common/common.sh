@@ -25,7 +25,7 @@ CLEAN=false
 clean_dir_contents() {
   local d="$1"
   [[ -d "$d" ]] || return 0
-  find "$d" -mindepth 1 -maxdepth 1 -exec rm -rf {} +
+  find "$d" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
 }
 
 # Print the caller script's leading "# ..." comment block (help text).
@@ -69,6 +69,15 @@ copy_agents_md_between_roots() {
   echo "agent-guidelines: copied $src -> $dst"
 }
 
+# _require_flag_value <caller_script> <flag_name> <argc_remaining>
+#   Exits 2 if a value-taking flag has no following argument.
+_require_flag_value() {
+  local rcaller="$1" flag="$2" argc="$3"
+  if [[ "$argc" -lt 2 ]]; then
+    echo "Error: $flag requires a value." >&2; echo >&2; _print_help_from_caller "$rcaller" >&2; exit 2
+  fi
+}
+
 # parse_io_args "$@"
 #   Sets $INPUT, $OUTPUT, $ITEMS from -i/--input, -o/--output, --items.
 #   Sets $CLEAN=true if --clean is present (default false).
@@ -82,9 +91,15 @@ parse_io_args() {
   CLEAN=false
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      -i|--input)  INPUT="${2:-}"; shift 2;;
-      -o|--output) OUTPUT="${2:-}"; shift 2;;
-      --items)     ITEMS="${2:-}"; shift 2;;
+      -i|--input)
+        _require_flag_value "$caller" "$1" "$#"
+        INPUT="$2"; shift 2;;
+      -o|--output)
+        _require_flag_value "$caller" "$1" "$#"
+        OUTPUT="$2"; shift 2;;
+      --items)
+        _require_flag_value "$caller" "$1" "$#"
+        ITEMS="$2"; shift 2;;
       --clean)     CLEAN=true; shift;;
       -h|--help)   _print_help_from_caller "$caller"; exit 0;;
       *)           echo "Unknown arg: $1" >&2; echo >&2; _print_help_from_caller "$caller" >&2; exit 2;;
@@ -272,7 +287,16 @@ sync_items() {
 
   local -a selected=()
   if [[ -n "$ITEMS" ]]; then
-    IFS=',' read -r -a selected <<< "$ITEMS"
+    local -a raw=()
+    IFS=',' read -r -a raw <<< "$ITEMS"
+    local item trimmed
+    for item in "${raw[@]}"; do
+      # Strip leading whitespace (remove from start up to first non-space char),
+      # then strip trailing whitespace (remove from last non-space char to end).
+      trimmed="${item#"${item%%[![:space:]]*}"}"
+      trimmed="${trimmed%"${trimmed##*[![:space:]]}"}"
+      [[ -n "$trimmed" ]] && selected+=("$trimmed")
+    done
   else
     selected=("${all[@]+"${all[@]}"}")
   fi

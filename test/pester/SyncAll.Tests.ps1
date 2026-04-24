@@ -59,9 +59,10 @@ Describe 'sync-all.ps1' {
 
   It 'missing required parameters does not hang (non-interactive pwsh errors)' {
     # Calling a script with missing Mandatory params can trigger an interactive prompt.
-    # Run in a separate non-interactive pwsh so we get a normal error/exit code.
+    # Run in a separate non-interactive process so we get a normal error/exit code.
+    $exe = (Get-Process -Id $PID).MainModule.FileName
     $cmd = "& '$script:SyncAllPs1' -InputRoot 'x'"
-    $p = Start-Process -FilePath 'pwsh' -ArgumentList @('-NoProfile','-NonInteractive','-Command', $cmd) -PassThru -Wait
+    $p = Start-Process -FilePath $exe -ArgumentList @('-NoProfile','-NonInteractive','-Command', $cmd) -PassThru -Wait
     $p.ExitCode | Should -Not -Be 0
   }
 
