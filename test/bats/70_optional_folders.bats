@@ -1,6 +1,7 @@
 #!/usr/bin/env bats
 # Each of agents/, skills/, rules/, mcp-servers/ is optional. sync-all should
-# skip the corresponding subscript with a console note instead of erroring.
+# succeed when they are absent; agents/skills/rules are skipped with a console
+# note instead of erroring.
 
 load 'test_helper.bash'
 
