@@ -1,4 +1,4 @@
-# Agent guidance (ai-dev-agent-config-sync)
+# Agent guidance (cyncia)
 
 Conventions for AI assistants working in this repository.
 

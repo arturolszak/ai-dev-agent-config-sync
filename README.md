@@ -1,4 +1,4 @@
-# ai-dev-agent-config-sync
+# cyncia
 
 Tool-agnostic source of truth for AI coding-assistant configuration —
 **agents**, **skills**, **rules/guidelines**, and a top-level **`AGENTS.md`** —
@@ -437,7 +437,7 @@ Reference docs: [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submod
 
 The simplest setup pulls **only the two directories you need** from a tagged
 release or `main` into a directory of your choice (the examples use
-`ai-dev-agent-config-sync/` at your project root — pick any name; it's just a
+`cyncia/` at your project root — pick any name; it's just a
 plain subdirectory in your repo, not auto-tracked or auto-linked to upstream).
 Two equivalent variants:
 
@@ -448,13 +448,13 @@ can `git pull` to update.
 
 ```bash
 git clone --depth=1 --filter=blob:none --sparse \
-  https://github.com/crestreach/ai-dev-agent-config-sync.git ai-dev-agent-config-sync
-git -C ai-dev-agent-config-sync sparse-checkout set scripts skills
+  https://github.com/crestreach/cyncia.git cyncia
+git -C cyncia sparse-checkout set scripts skills
 ```
 
 To pin a tag instead of `main`, add `--branch vX.Y.Z` to the `git clone` line.
 
-**Update later:** `git -C ai-dev-agent-config-sync pull`.
+**Update later:** `git -C cyncia pull`.
 
 #### Variant B — tarball (no `.git/` left behind)
 
@@ -464,22 +464,22 @@ No Git history, no submodule pointer — just two checked-in directories.
 ```bash
 # From the root of your other project. Pick main, a branch, or a tag (vX.Y.Z).
 REF=main
-mkdir -p ai-dev-agent-config-sync
-curl -sL "https://github.com/crestreach/ai-dev-agent-config-sync/archive/${REF}.tar.gz" \
-  | tar -xz --strip-components=1 -C ai-dev-agent-config-sync \
-      "ai-dev-agent-config-sync-${REF}/scripts" \
-      "ai-dev-agent-config-sync-${REF}/skills"
+mkdir -p cyncia
+curl -sL "https://github.com/crestreach/cyncia/archive/${REF}.tar.gz" \
+  | tar -xz --strip-components=1 -C cyncia \
+      "cyncia-${REF}/scripts" \
+      "cyncia-${REF}/skills"
 ```
 
 PowerShell equivalent (`tar` ships with Windows 10+):
 
 ```powershell
 $Ref = 'main'
-New-Item -ItemType Directory -Force ai-dev-agent-config-sync | Out-Null
-Invoke-WebRequest "https://github.com/crestreach/ai-dev-agent-config-sync/archive/$Ref.tar.gz" -OutFile aidacs.tgz
-tar -xzf aidacs.tgz --strip-components=1 -C ai-dev-agent-config-sync `
-  "ai-dev-agent-config-sync-$Ref/scripts" `
-  "ai-dev-agent-config-sync-$Ref/skills"
+New-Item -ItemType Directory -Force cyncia | Out-Null
+Invoke-WebRequest "https://github.com/crestreach/cyncia/archive/$Ref.tar.gz" -OutFile aidacs.tgz
+tar -xzf aidacs.tgz --strip-components=1 -C cyncia `
+  "cyncia-$Ref/scripts" `
+  "cyncia-$Ref/skills"
 Remove-Item aidacs.tgz
 ```
 
@@ -493,13 +493,13 @@ consumers this is the right default.
 
 ### Git submodule
 
-The parent repo records **which commit** of `ai-dev-agent-config-sync` it uses. Replace the
-URL with your fork if needed (for example `https://github.com/crestreach/ai-dev-agent-config-sync.git`).
+The parent repo records **which commit** of `cyncia` it uses. Replace the
+URL with your fork if needed (for example `https://github.com/crestreach/cyncia.git`).
 
 ```bash
 # From the root of your other project
-git submodule add https://github.com/crestreach/ai-dev-agent-config-sync.git path/to/ai-dev-agent-config-sync
-git commit -m "Add ai-dev-agent-config-sync as a submodule"
+git submodule add https://github.com/crestreach/cyncia.git path/to/cyncia
+git commit -m "Add cyncia as a submodule"
 ```
 
 **Cloning a project that already has submodules:**
@@ -514,13 +514,13 @@ git submodule update --init --recursive
 the parent:
 
 ```bash
-cd path/to/ai-dev-agent-config-sync
+cd path/to/cyncia
 git fetch origin
 git checkout main
 git pull
 cd -
-git add path/to/ai-dev-agent-config-sync
-git commit -m "Bump ai-dev-agent-config-sync submodule"
+git add path/to/cyncia
+git commit -m "Bump cyncia submodule"
 ```
 
 To **pin a release**, check out a tag inside the submodule (`git checkout v1.2.3`)
@@ -537,13 +537,13 @@ Upstream is merged into a **prefix directory** inside your single repository;
 `git clone` of your app does not need `--recurse-submodules`.
 
 ```bash
-git subtree add --prefix=path/to/ai-dev-agent-config-sync https://github.com/crestreach/ai-dev-agent-config-sync.git main --squash
+git subtree add --prefix=path/to/cyncia https://github.com/crestreach/cyncia.git main --squash
 ```
 
 **Update later** (may require merge conflict resolution):
 
 ```bash
-git subtree pull --prefix=path/to/ai-dev-agent-config-sync https://github.com/crestreach/ai-dev-agent-config-sync.git main --squash
+git subtree pull --prefix=path/to/cyncia https://github.com/crestreach/cyncia.git main --squash
 ```
 
 **Trade-off:** One clone for everyone; updates are merges and can conflict.
@@ -565,16 +565,16 @@ mkdir -p config/skills
 [ -f config/AGENTS.md ] || echo "# Project guidelines" > config/AGENTS.md
 
 # 2. Copy the skill into your source tree.
-cp -R ai-dev-agent-config-sync/skills/agent-conf-sync config/skills/
+cp -R cyncia/skills/agent-conf-sync config/skills/
 
 # 3. Sync it into every tool's native layout (.cursor, .claude, .github, .junie).
-ai-dev-agent-config-sync/scripts/sync-all.sh -i "$PWD/config" -o "$PWD"
+cyncia/scripts/sync-all.sh -i "$PWD/config" -o "$PWD"
 ```
 
 Or for a single tool only (e.g. just Claude Code):
 
 ```bash
-ai-dev-agent-config-sync/scripts/sync-all.sh -i "$PWD/config" -o "$PWD" --tools claude
+cyncia/scripts/sync-all.sh -i "$PWD/config" -o "$PWD" --tools claude
 ```
 
 PowerShell:
@@ -582,21 +582,21 @@ PowerShell:
 ```powershell
 New-Item -ItemType Directory -Force config\skills | Out-Null
 if (-not (Test-Path config\AGENTS.md)) { '# Project guidelines' | Set-Content config\AGENTS.md }
-Copy-Item -Recurse ai-dev-agent-config-sync\skills\agent-conf-sync config\skills\
-.\ai-dev-agent-config-sync\scripts\sync-all.ps1 -InputRoot "$PWD\config" -OutputRoot $PWD
+Copy-Item -Recurse cyncia\skills\agent-conf-sync config\skills\
+.\cyncia\scripts\sync-all.ps1 -InputRoot "$PWD\config" -OutputRoot $PWD
 ```
 
 After this, your assistant has the skill loaded and you can ask it in plain
 language to "sync agent config", "regenerate Cursor rules", etc.
 ### After vendoring: run sync and decide what to commit
 
-From your project, with this repo at `path/to/ai-dev-agent-config-sync`:
+From your project, with this repo at `path/to/cyncia`:
 
 ```bash
-path/to/ai-dev-agent-config-sync/scripts/sync-all.sh -i path/to/your/configs -o .
+path/to/cyncia/scripts/sync-all.sh -i path/to/your/configs -o .
 ```
 
-On Windows, use `path\to\ai-dev-agent-config-sync\scripts\sync-all.ps1`.
+On Windows, use `path\to\cyncia\scripts\sync-all.ps1`.
 
 Then either **commit the generated** `.cursor/`, `.github/`, `.claude/`,
 `.junie/`, and copies of guidelines in your app repo so the team gets them

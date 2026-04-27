@@ -1,4 +1,4 @@
-# Agent guidance (ai-dev-agent-config-sync)
+# Agent guidance (cyncia)
 
 Conventions for AI assistants working in this repository.
 
@@ -23,8 +23,8 @@ Conventions for AI assistants working in this repository.
 
 ### Tools and environment
 
-    - Use the workspace as source of truth (read files, run commands) instead of guessing paths or versions.
-    - Note OS/shell assumptions when relevant (e.g. macOS paths, zsh), especially for scripts or one-off commands.
+- Use the workspace as source of truth (read files, run commands) instead of guessing paths or versions.
+- Note OS/shell assumptions when relevant (e.g. macOS paths, zsh), especially for scripts or one-off commands.
 
 ## Communication
 
