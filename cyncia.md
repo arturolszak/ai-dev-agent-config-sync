@@ -574,6 +574,45 @@ Then either **commit the generated** `.cursor/`, `.github/`, `.claude/`,
 `.junie/`, `AGENTS.md`, and `CLAUDE.md` so the team gets them without running
 scripts, **or** document that everyone must run `sync-all` after pulling.
 
+## Configuration (`.cyncia/cyncia.conf`)
+
+The installer creates `.cyncia/cyncia.conf` with sensible defaults and leaves
+it alone on subsequent runs. When a new version of cyncia introduces a new
+property the installer prompts you to add it (default **yes**); when a
+property is no longer supported it prompts to remove it (default **no**). User
+comments and unrelated content are preserved across reconciliation.
+
+The file is a tiny flat YAML — one `key: value` pair per line, plus comments
+and blank lines. Sync scripts read it via the helpers `read_cyncia_conf`
+(Bash, `scripts/common/common.sh`) and `Get-CynciaConfValue` (PowerShell,
+`scripts/common/common.ps1`). Search order:
+
+1. `$CYNCIA_CONF` (if set and the file exists) — used by the test suites and
+   for ad-hoc overrides.
+2. `<scripts_parent>/../cyncia.conf` — i.e. `.cyncia/cyncia.conf` in the
+   canonical installed layout (where the scripts live at
+   `.cyncia/scripts/...`), or `<repo>/cyncia.conf` in the repo-clone layout
+   used by this project's own self-tests.
+
+If the file or a property is missing, sync scripts use the built-in default
+(no behavior change for projects that pre-date the property).
+
+Currently supported properties:
+
+| Key | Default | Values | Effect |
+|---|---|---|---|
+| `claude_rules_mode` | `claude-md` | `claude-md`, `rule-files` | How `rules/<n>.md` is emitted for Claude Code. `claude-md` merges every rule body into `CLAUDE.md` (the previous behavior; `scripts/claude/sync-rules.{sh,ps1}` is a no-op). `rule-files` writes each rule to `.claude/rules/<n>.md` (frontmatter stripped) and references it from `CLAUDE.md` via Claude Code's `@`-import syntax (`@.claude/rules/<n>.md`), so each rule is loaded by Claude Code with the same priority as `CLAUDE.md`. Unknown values fall back to `claude-md` with a warning. |
+
+Example:
+
+```yaml
+# How rules/<name>.md is emitted for Claude Code: 'claude-md' merges rule
+# bodies into CLAUDE.md (default); 'rule-files' writes one file per rule to
+# .claude/rules/<name>.md and imports them from CLAUDE.md via @-imports so
+# Claude loads them with the same priority as CLAUDE.md.
+claude_rules_mode: claude-md
+```
+
 ## License
 
 This project is released under the [MIT License](LICENSE).
